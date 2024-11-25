@@ -116,9 +116,13 @@ int main()
             }
 
             std::string link = songArr.getCell(sortIndex[i], 4);
-            system(("start " + link).c_str());
-            incPlayCount(songArr, sortIndex[i], 3);
-            sortPlayCount(songArr, sortIndex);
+            if (!link.empty()) {
+                system(("start " + link).c_str());
+                incPlayCount(songArr, sortIndex[i], 3);
+                sortPlayCount(songArr, sortIndex);
+            } else {
+                std::cout << "Cannot play song: invalid index " << i << std::endl;
+            }
         }
 
         else if (input.substr(0, 7) == "newList") {
