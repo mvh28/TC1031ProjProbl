@@ -1,7 +1,7 @@
 #include "header.h"
 #include "address.h"
 
-void writeCSV(const std::string &filename, const addressMap<std::string> &map, const std::vector<std::string> &header){
+void writeCSV(const std::string &filename, addressMap<std::string> &map, std::vector<std::string> &header){
     if (filename == ""){
         return;
     }
@@ -22,7 +22,7 @@ void writeCSV(const std::string &filename, const addressMap<std::string> &map, c
     file << "\n";
 
     for (int i = 0; i < map.getRowCount(); ++i) {
-        const std::vector<std::string>* row = map.getRow(i);
+        std::vector<std::string>* row = map.getRow(i);
         for (size_t j = 0; j < row->size(); ++j) {
             file << (*row)[j];
             if (j < row->size() - 1) file << ",";

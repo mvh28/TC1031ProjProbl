@@ -1,5 +1,6 @@
 #include "address.h"
 #include "header.h"
+#include "radixSort.h"
 #include "readCSV.h"
 #include "writeCSV.h"
 
@@ -12,6 +13,24 @@ void incPlayCount(addressMap<std::string>& map, int row, int col)
     playCountStr = std::to_string(playCount);
 
     map.updateCell(row, col, playCountStr);
+}
+
+void refreshSortIndex(addressMap<std::string>& map, std::vector<int>& sortIndex)
+{
+    sortIndex.clear(); // Clear existing indices
+    for (int i = 0; i < map.getRowCount(); i++) {
+        if (map.getRow(i) != nullptr) { // Only add indices for existing rows
+            sortIndex.push_back(i);
+        }
+    }
+}
+
+void sortPlayCount(addressMap<std::string>& map, std::vector<int>& sortIndex)
+{
+    refreshSortIndex(map, sortIndex);
+    if (!sortIndex.empty()) {
+        publicSort(map, sortIndex, 3);
+    }
 }
 
 int main()
@@ -58,6 +77,7 @@ int main()
                 std::cout << "Invalid filename or input" << std::endl;
             } else {
                 readCSV(filename, songArr, headerRow);
+                sortPlayCount(songArr, sortIndex);
             }
         }
 
@@ -74,6 +94,10 @@ int main()
                     size = 10;
                 }
             }
+            for (int i = 0; i < headerRow.size(); i++) {
+                std::cout << headerRow[i] << ", ";
+            }
+            std::cout << std::endl;
 
             for (int i = 0; i < size; i++) {
                 songArr.printRow(i);
@@ -85,7 +109,7 @@ int main()
             std::stringstream ss(input);
             std::string command;
             int i;
-            ss << command << i;
+            ss >> command >> i;
 
             if (ss.fail()) {
                 i = 0;
@@ -94,17 +118,16 @@ int main()
             std::string link = songArr.getCell(sortIndex[i], 4);
             system(("start " + link).c_str());
             incPlayCount(songArr, sortIndex[i], 3);
+            sortPlayCount(songArr, sortIndex);
         }
 
         else if (input.substr(0, 7) == "newList") {
             std::stringstream ss(input);
             std::string command;
             std::string filename;
-            ss << command << filename;
+            ss >> command >> filename;
 
-            filename = filename + ".csv";
-
-            std::ofstream file(filename);
+            std::ofstream file(filename + ".csv");
 
             if (!file.is_open()) {
                 std::cerr << "Error creating file: " << filename << std::endl;
@@ -126,7 +149,7 @@ int main()
         }
 
         else if (input.substr(0, 7) == "newSong") {
-            std::vector<std::string> newSong;
+            std::vector<std::string> newSong(5);
             std::string inVal;
 
             std::cout << "What is the song name?" << std::endl;
@@ -145,22 +168,24 @@ int main()
             std::getline(std::cin, inVal);
             newSong[4] = inVal;
 
-            newSong[0] = "0";
+            newSong[3] = "0";
 
             songArr.insertRow(newSong);
+            sortPlayCount(songArr, sortIndex);
         }
 
         else if (input.substr(0, 10) == "removeSong") {
             std::stringstream ss(input);
             std::string command;
             int i;
-            ss << command << i;
+            ss >> command >> i;
             if (ss.fail()) {
                 i = 0;
             }
 
             songArr.removeRow(sortIndex[i]);
             std::cout << "Cleared song at index " << sortIndex[i];
+            sortPlayCount(songArr, sortIndex);
         }
 
         else {

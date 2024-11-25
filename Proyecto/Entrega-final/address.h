@@ -18,7 +18,7 @@ class addressMap{
         bool empty() const;
         void insertRow(const std::vector<T>&);
         std::vector<T>* getRow(int);
-        T& getCell(int, int) const;
+        T& getCell(int, int);
         void printRow(int);
         void printRowAddress(int);
         void updateRow(int, const std::vector<T>&);
@@ -50,8 +50,11 @@ bool addressMap<T>::empty() const{
 
 template <class T>
 void addressMap<T>::insertRow(const std::vector<T>& rowInfo){
+    int index;
     if (storage.empty()){
-        storage[rowCount] = new std::vector<T>(rowInfo);
+        index = 0;
+        storage[index] = new std::vector<T>(rowInfo);
+        rowCount = 1;
     }
     else{
         int expectedColumns = storage.begin()->second->size();
@@ -59,10 +62,8 @@ void addressMap<T>::insertRow(const std::vector<T>& rowInfo){
             std::cout << "Expected columns: " << expectedColumns << std::endl;
             std::cout << "Actual: " << rowInfo.size() << std::endl;
             std::cerr << "Couldn't insert row" << std::endl;
-            throw std::runtime_error("Row does not match column size");
         }
     
-        int index;
         std::vector<T>* newRow = new std::vector<T>(rowInfo);
 
         if (!freeIndex.empty()){
@@ -74,8 +75,8 @@ void addressMap<T>::insertRow(const std::vector<T>& rowInfo){
         }
 
         storage[index] = newRow;
-        std::cout << "Row inserted at index " << index << std::endl;
     }
+    std::cout << "Row inserted at index " << index << std::endl;
 }
 
 template <class T>
@@ -90,7 +91,7 @@ std::vector<T>* addressMap<T>::getRow(int index){
 }
 
 template <class T>
-T& addressMap<T>::getCell(int index, int col) const{
+T& addressMap<T>::getCell(int index, int col){
     if (storage.find(index) == storage.end()){
         throw std::out_of_range("Row index out of bounds");
     }

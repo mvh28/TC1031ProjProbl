@@ -5,6 +5,7 @@
 #include "address.h"
 
 void readCSV(const std::string& filename, addressMap<std::string>& map, std::vector<std::string>& headerRow) {
+    headerRow = {};
     if (!map.empty()){
         map.clear();
     }
