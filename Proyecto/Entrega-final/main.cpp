@@ -8,14 +8,20 @@ void incPlayCount(addressMap<std::string>& map, int row, int col)
 {
     std::string playCountStr = map.getCell(row, col);
 
-    int playCount = std::stoi(playCountStr);
-    playCount++;
-    playCountStr = std::to_string(playCount);
+    if (!playCountStr.empty()) {
+        try {
+            int playCount = std::stoi(playCountStr);
+            playCount++;
+            playCountStr = std::to_string(playCount);
 
-    map.updateCell(row, col, playCountStr);
+            map.updateCell(row, col, playCountStr);
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Error: play count is not a valid number" << std::endl;
+        }
+    }
 }
 
-void refreshSortIndex(addressMap<std::string>& map, std::vector<int>& sortIndex)
+void sortPlayCount(addressMap<std::string>& map, std::vector<int>& sortIndex)
 {
     sortIndex.clear(); // Clear existing indices
     for (int i = 0; i < map.getRowCount(); i++) {
@@ -23,13 +29,14 @@ void refreshSortIndex(addressMap<std::string>& map, std::vector<int>& sortIndex)
             sortIndex.push_back(i);
         }
     }
-}
 
-void sortPlayCount(addressMap<std::string>& map, std::vector<int>& sortIndex)
-{
-    refreshSortIndex(map, sortIndex);
     if (!sortIndex.empty()) {
+        try{
         publicSort(map, sortIndex, 3);
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Error during sorting: " << e.what() << std::endl;
+        }
     }
 }
 
@@ -40,7 +47,6 @@ int main()
     addressMap<std::string> songArr;
     std::vector<std::string> headerRow;
     headerRow = {};
-    std::string filename = "";
 
     std::vector<int> sortIndex(songArr.getRowCount());
     for (int i = 0; i < songArr.getRowCount(); i++) {
@@ -51,9 +57,8 @@ int main()
         std::cout << "Input " << inNum << ": ";
         std::getline(std::cin, input);
 
-        // To exit proram, don't consider other cases
+        // To exit program, don't consider other cases
         if (input == "exit") {
-            writeCSV(filename, songArr, headerRow);
             break;
         }
 
@@ -63,18 +68,36 @@ int main()
                       << std::endl;
         }
 
+        else if (input.substr(0, 4) == "save") {
+            std::stringstream ss(input);
+            std::string command;
+            std::string saveFilename;
+            ss >> command >> saveFilename;
+
+            if (!saveFilename.empty() && saveFilename[0] == ' ') {
+                saveFilename.erase(0, 1);
+            }
+
+            if (saveFilename.empty()) {
+                std::cerr << "Save cancelled. No filename provided." << std::endl;
+            } else {
+                writeCSV(saveFilename, songArr, headerRow);
+                std::cout << "List saved to " << saveFilename << ".csv" << std::endl;
+            }
+        }
+
         else if (input.substr(0, 4) == "read") {
             std::stringstream ss(input);
             std::string command;
-            ss >> command;
+            std::string filename;
+            ss >> command >> filename;
 
-            std::getline(ss, filename);
             if (!filename.empty() && filename[0] == ' ') {
                 filename.erase(0, 1);
             }
 
             if (filename.empty()) {
-                std::cout << "Invalid filename or input" << std::endl;
+                std::cerr << "Invalid filename or input" << std::endl;
             } else {
                 readCSV(filename, songArr, headerRow);
                 sortPlayCount(songArr, sortIndex);
@@ -95,7 +118,10 @@ int main()
                 }
             }
             for (int i = 0; i < headerRow.size(); i++) {
-                std::cout << headerRow[i] << ", ";
+                std::cout << headerRow[i];
+                if (i < headerRow.size() - 1) {
+                    std::cout << ", ";
+                }
             }
             std::cout << std::endl;
 
@@ -130,25 +156,32 @@ int main()
             std::string command;
             std::string filename;
             ss >> command >> filename;
+            if (!filename.empty() && filename[0] == ' ') {
+                filename.erase(0, 1);
+            }
 
-            std::ofstream file(filename + ".csv");
-
-            if (!file.is_open()) {
-                std::cerr << "Error creating file: " << filename << std::endl;
+            if (filename.empty()) {
+                std::cerr << "Invalid filename" << std::endl;
             } else {
-                headerRow = { "Artist", "Song", "Genre", "Number of Plays", "Link to Song" };
+                std::ofstream file(filename + ".csv");
 
-                for (int i = 0; i < headerRow.size(); i++) {
-                    file << headerRow[i];
-                    if (i < headerRow.size() - 1) {
-                        file << ",";
+                if (!file.is_open()) {
+                    std::cerr << "Error creating file: " << filename << std::endl;
+                } else {
+                    headerRow = { "Artist", "Song", "Genre", "Number of Plays", "Link to Song" };
+
+                    for (int i = 0; i < headerRow.size(); i++) {
+                        file << headerRow[i];
+                        if (i < headerRow.size() - 1) {
+                            file << ",";
+                        }
                     }
+                    file << "\n";
+
+                    file.close();
+
+                    readCSV(filename, songArr, headerRow);
                 }
-                file << "\n";
-
-                file.close();
-
-                readCSV(filename, songArr, headerRow);
             }
         }
 

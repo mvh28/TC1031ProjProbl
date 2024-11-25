@@ -119,8 +119,11 @@ void addressMap<T>::printRow(int index)
     try {
         std::vector<T>* row = getRow(index);
         if (row != nullptr) {
-            for (const auto& cell : *row) {
-                std::cout << cell << ", ";
+            for (size_t i = 0; i < row->size(); i++){
+                std::cout << (*row)[i];
+                if (i < row->size() - 1){
+                    std::cout << ", ";
+                }
             }
             std::cout << std::endl;
         }
