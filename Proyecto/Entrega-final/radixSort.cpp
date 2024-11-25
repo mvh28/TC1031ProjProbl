@@ -1,6 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
+#include "header.h"
 #include "address.h"
 
 const int R = 256; // Radix for characters in ASCII format

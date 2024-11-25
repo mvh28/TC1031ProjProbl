@@ -1,8 +1,10 @@
 #include "address.h"
 #include "header.h"
 #include "readCSV.h"
+#include "writeCSV.h"
 
-void incPlayCount(addressMap<std::string>& map, int row, int col){
+void incPlayCount(addressMap<std::string>& map, int row, int col)
+{
     std::string playCountStr = map.getCell(row, col);
 
     int playCount = std::stoi(playCountStr);
@@ -12,7 +14,6 @@ void incPlayCount(addressMap<std::string>& map, int row, int col){
     map.updateCell(row, col, playCountStr);
 }
 
-
 int main()
 {
     std::string input;
@@ -20,6 +21,7 @@ int main()
     addressMap<std::string> songArr;
     std::vector<std::string> headerRow;
     headerRow = {};
+    std::string filename = "";
 
     std::vector<int> sortIndex(songArr.getRowCount());
     for (int i = 0; i < songArr.getRowCount(); i++) {
@@ -32,6 +34,7 @@ int main()
 
         // To exit proram, don't consider other cases
         if (input == "exit") {
+            writeCSV(filename, songArr, headerRow);
             break;
         }
 
@@ -44,7 +47,6 @@ int main()
         else if (input.substr(0, 4) == "read") {
             std::stringstream ss(input);
             std::string command;
-            std::string filename;
             ss >> command;
 
             std::getline(ss, filename);
@@ -79,17 +81,13 @@ int main()
             std::cout << std::endl;
         }
 
-        else if (input.substr(0, 6) == "filter") {
-
-        }
-
         else if (input.substr(0, 4) == "play") {
             std::stringstream ss(input);
             std::string command;
             int i;
             ss << command << i;
 
-            if (ss.fail()){
+            if (ss.fail()) {
                 i = 0;
             }
 
@@ -108,30 +106,29 @@ int main()
 
             std::ofstream file(filename);
 
-            if (!file.is_open()){
+            if (!file.is_open()) {
                 std::cerr << "Error creating file: " << filename << std::endl;
-                break;
-            }
+            } else {
+                headerRow = { "Artist", "Song", "Genre", "Number of Plays", "Link to Song" };
 
-            headerRow = {"Artist", "Song", "Genre", "Number of Plays", "Link to Song"};
-
-            for (int i = 0; i < headerRow.size(); i++){
-                file << headerRow[i];
-                if (i < headerRow.size() - 1){
-                    file << ",";
+                for (int i = 0; i < headerRow.size(); i++) {
+                    file << headerRow[i];
+                    if (i < headerRow.size() - 1) {
+                        file << ",";
+                    }
                 }
+                file << "\n";
+
+                file.close();
+
+                readCSV(filename, songArr, headerRow);
             }
-            file << "\n";
-
-            file.close();
-
-            readCSV(filename, songArr, headerRow);
         }
 
         else if (input.substr(0, 7) == "newSong") {
             std::vector<std::string> newSong;
             std::string inVal;
-            
+
             std::cout << "What is the song name?" << std::endl;
             std::getline(std::cin, inVal);
             newSong[1] = inVal;
@@ -158,7 +155,7 @@ int main()
             std::string command;
             int i;
             ss << command << i;
-            if (ss.fail()){
+            if (ss.fail()) {
                 i = 0;
             }
 

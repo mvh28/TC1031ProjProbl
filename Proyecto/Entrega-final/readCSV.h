@@ -9,7 +9,7 @@ void readCSV(const std::string& filename, addressMap<std::string>& map, std::vec
         map.clear();
     }
 
-    std::ifstream file(filename); // Open file
+    std::ifstream file(filename + ".csv"); // Open file
 
     if (!file.is_open()){
         std::cerr << "Error opening file: " << filename << std::endl;
