@@ -31,10 +31,9 @@ void sortPlayCount(addressMap<std::string>& map, std::vector<int>& sortIndex)
     }
 
     if (!sortIndex.empty()) {
-        try{
-        publicSort(map, sortIndex, 3);
-        }
-        catch (const std::exception& e) {
+        try {
+            publicSort(map, sortIndex, 3);
+        } catch (const std::exception& e) {
             std::cerr << "Error during sorting: " << e.what() << std::endl;
         }
     }
@@ -64,8 +63,15 @@ int main()
 
         // For help input show screan with options
         else if (input == "help") {
-            std::cout << "Available commands with opt. inputs\n"
-                      << std::endl;
+            std::cout << "Available commands with opt. inputs" << std::endl;
+            std::cout << "help: Show this help message" << std::endl;
+            std::cout << "read <filename>: Read a CSV file and update the song list" << std::endl;
+            std::cout << "newList <filename>: Create a new song list" << std::endl;
+            std::cout << "newSong: Add a new song, will prompt the user" << std::endl;
+            std::cout << "removeSong <index>: Remove a song at the given index" << std::endl;
+            std::cout << "play <index>: Play the song at the given index" << std::endl;
+            std::cout << "save <filename>: Save the current song list to a CSV file" << std::endl;
+            std::cout << "exit: Exit the program" << std::endl;
         }
 
         else if (input.substr(0, 4) == "save") {
@@ -107,16 +113,21 @@ int main()
         else if (input.substr(0, 5) == "print") {
             std::stringstream ss(input);
             std::string command;
-            int size;
-            ss >> command >> size;
+            int size = -1;
+            ss >> command;
 
-            if (ss.fail()) {
+            if (!(ss >> size) || size < 0) {
                 if (sortIndex.size() < 10) {
                     size = sortIndex.size();
                 } else {
                     size = 10;
                 }
             }
+
+            if (size > sortIndex.size()){
+                size = sortIndex.size();
+            }
+
             for (int i = 0; i < headerRow.size(); i++) {
                 std::cout << headerRow[i];
                 if (i < headerRow.size() - 1) {
@@ -126,6 +137,7 @@ int main()
             std::cout << std::endl;
 
             for (int i = 0; i < size; i++) {
+                std :: cout << i << ". ";
                 songArr.printRow(i);
             }
             std::cout << std::endl;
@@ -134,11 +146,16 @@ int main()
         else if (input.substr(0, 4) == "play") {
             std::stringstream ss(input);
             std::string command;
-            int i;
-            ss >> command >> i;
+            int i = -1;
+            ss >> command;
 
-            if (ss.fail()) {
-                i = 0;
+            if (!(ss >> i)) {
+                i = 0; // Default to first item if no index provided
+            }
+
+            if (i < 0 || i >= sortIndex.size()) {
+                std::cout << "Invalid index. Must be between 0 and " << (sortIndex.size() - 1) << std::endl;
+                continue;
             }
 
             std::string link = songArr.getCell(sortIndex[i], 4);

@@ -75,26 +75,22 @@ void radixSort(addressMap<std::string>& map, std::vector<int>& index, std::vecto
     }
 }
 
-void reverseOrder(std::vector<int>& index, int low, int high)
-{
-    while (low < high) {
-        std::swap(index[low], index[high]);
-        low++;
-        high--;
-    }
-}
-
-void publicSort(addressMap<std::string>& map, std::vector<int>& index, int col)
-{
+void publicSort(addressMap<std::string> &map, std::vector<int> &index, int col) {
     int size = map.getRowCount();
-    if (size <= 1)
-        return;
-
+    if (size <= 1) return;
+    
+    // Ensure index is properly sized
+    if (index.size() != size) {
+        index.resize(size);
+        for (int i = 0; i < size; i++) {
+            index[i] = i;
+        }
+    }
+    
     std::vector<int> aux(size);
-    radixSort(map, index, aux, 0, size - 1, 0, col);
-
-    // For play count column, reverse the order to get descending sorting
-    if (col == 3) {
-        reverseOrder(index, 0, size - 1);
+    try {
+        radixSort(map, index, aux, 0, size - 1, 0, col);
+    } catch (...) {
+        std::cerr << "Error during sorting" << std::endl;
     }
 }
