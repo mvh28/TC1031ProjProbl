@@ -14,6 +14,7 @@ struct TreeNode {
 class Solution {
 public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
+
     {
         if (preorder.empty() || inorder.empty()){
             return nullptr;

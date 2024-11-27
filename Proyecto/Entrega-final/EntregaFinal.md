@@ -23,6 +23,7 @@ Ya hay alguna manera de manejar con los errores que pueden salir de la programa,
 1. Gran cambio al primer avance para intentar de manejar errores. Cuando estuvo connectando al primer avance con la segunda, estuvo saliendo con el proximo error en el debugger:
 
 `warning: Critical error detected c0000374`
+
 `Thread 1 received signal SIGTRAP, Trace/breakpoint trap.`
 
 Hice varios cambios sobre el primer avance, en algunas partes con ayuda de Claude3.5 para ayudarme como nunca habia vista este error. En realidad los cambios ayudaron para evitar que la programa quebro pero al momento destruyo la funcionamiento del primer avance.
