@@ -56,12 +56,3 @@ public:
         return h;
     }
 };
-
-int main()
-{
-    Solution solution;
-    int h;
-    vector<int> citations = { 3, 0, 6, 1, 3, 2 };
-    h = solution.hIndex(citations);
-    cout << h;
-}
